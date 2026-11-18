@@ -123,8 +123,8 @@
     {
       "id": "EZE2026000430739",
       "date": "2026-11-02",
-      "start": null,
-      "end": null,
+      "start": 51,
+      "end": 90,
       "odo": null,
       "kwh": 36.95,
       "tl": 180.67,
