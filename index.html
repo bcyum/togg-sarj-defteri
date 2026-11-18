@@ -193,7 +193,7 @@ footer p{margin:0 0 6px;max-width:70ch}
   </div>
 
   <section>
-    <div class="sechead"><h2>Toplam harcama zamanla</h2><p class="hint">Her nokta bir şarj; üzerine gelince detay</p></div>
+    <div class="sechead"><h2>Şarj başına birim fiyat (₺/kWh)</h2><p class="hint">Her nokta bir şarj, büyüklüğü kWh; üzerine gelince detay</p></div>
     <div class="chart" id="chartCum"></div>
   </section>
 
@@ -406,24 +406,22 @@ function drawCumulative(c){
   const box = $("chartCum");
   if (c.length < 2) { box.innerHTML = `<div class="empty">En az iki şarj gerekiyor.</div>`; return; }
   const day = iso => { const [y,m,d] = iso.split("-").map(Number); return Date.UTC(y,m-1,d)/864e5; };
-  let cum = 0; const pts = c.map(r => ({x: day(r.date) + (r.time ? (+r.time.slice(0,2)*60 + +r.time.slice(3,5))/1440 : 0.5), v: (cum += r.tl), r}));
-  const W = Math.max(300, box.clientWidth - 30), H = 240, Lm = 48, R = 62, T = 16, B = 30;
-  const x0 = pts[0].x, x1 = pts.at(-1).x || x0+1, max = cum;
-  const stepRaw = max/4, mag = Math.pow(10, Math.floor(Math.log10(stepRaw))), step = [1,2,2.5,5,10].map(s=>s*mag).find(s => s >= stepRaw);
-  const top = Math.ceil(max/step)*step;
-  const X = v => Lm + (W-Lm-R) * (v - x0) / (x1 - x0 || 1), Y = v => T + (H-T-B) * (1 - v/top);
+  const pts = c.filter(r => r.kwh > 0).map(r => ({x: day(r.date) + (r.time ? (+r.time.slice(0,2)*60 + +r.time.slice(3,5))/1440 : 0.5), v: r.tl/r.kwh, r}));
+  const W = Math.max(300, box.clientWidth - 30), H = 240, Lm = 40, R = 14, T = 16, B = 30;
+  const x0 = Math.min(...pts.map(p=>p.x)) - 1, x1 = Math.max(...pts.map(p=>p.x)) + 1;
+  const max = Math.max(...pts.map(p => p.v)), top = Math.ceil(max/2)*2 + (max % 2 > 1.6 ? 2 : 0), step = top > 12 ? 4 : 2;
+  const X = v => Lm + (W-Lm-R) * (v - x0) / (x1 - x0), Y = v => T + (H-T-B) * (1 - v/top);
   let g = "";
-  for (let v=0; v<=top+1e-9; v+=step) g += `<line x1="${Lm}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${Lm-6}" y="${Y(v)+4}" text-anchor="end">${nf(v,0)}</text>`;
+  for (let v=0; v<=top; v+=step) g += `<line x1="${Lm}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${Lm-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`;
   const f = pts[0].r.date.split("-").map(Number); let d = new Date(Date.UTC(f[0], f[1], 1));
   while (d.getTime()/864e5 <= x1) { const xv = X(d.getTime()/864e5); g += `<line x1="${xv}" x2="${xv}" y1="${T}" y2="${H-B}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${xv}" y="${H-B+18}" text-anchor="middle">${d.toLocaleDateString("tr-TR",{month:"short", timeZone:"UTC"})}</text>`; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+1, 1)); }
-  let path = `M${X(pts[0].x)},${Y(0)} `; let prev = 0;
-  pts.forEach(p => { path += `L${X(p.x)},${Y(prev)} L${X(p.x)},${Y(p.v)} `; prev = p.v; });
-  const area = path + `L${X(pts.at(-1).x)},${Y(0)} Z`;
-  const dots = pts.map(p => `<g class="hov"><title>${fmtDate(p.r.date)}${p.r.time ? " " + p.r.time : ""} · ${esc(prov(p.r))}: +${nf(p.r.tl,2)} ₺ → toplam ${nf(p.v,2)} ₺</title><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="9" fill="transparent"/><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="3" fill="var(--bar)" stroke="var(--surface)" stroke-width="1.5"/></g>`).join("");
-  const lp = pts.at(-1);
-  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Zaman içinde toplam şarj harcaması">${g}
-    <path d="${area}" fill="var(--accent-soft)" opacity=".6"/><path d="${path}" fill="none" stroke="var(--bar)" stroke-width="2" stroke-linejoin="round"/>${dots}
-    <text class="val" x="${X(lp.x)+8}" y="${Y(lp.v)+4}">${nf(lp.v,0)} ₺</text></svg>`;
+  const tK = pts.reduce((a,p)=>a+p.r.kwh,0), avg = pts.reduce((a,p)=>a+p.r.tl,0) / tK, kMax = Math.max(...pts.map(p=>p.r.kwh));
+  const dots = pts.map(p => { const rr = 3 + 6*Math.sqrt(p.r.kwh/kMax);
+    return `<g class="hov"><title>${fmtDate(p.r.date)}${p.r.time ? " " + p.r.time : ""} · ${esc(prov(p.r))}: ${nf(p.v,2)} ₺/kWh · ${nf(p.r.kwh,2)} kWh · ${nf(p.r.tl,2)} ₺</title><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${Math.max(rr,10)}" fill="transparent"/><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${rr}" fill="var(--bar)" fill-opacity=".75" stroke="var(--surface)" stroke-width="2"/></g>`; }).join("");
+  const ay = Y(avg);
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Şarj başına birim fiyat">${g}
+    <line x1="${Lm}" x2="${W-R}" y1="${ay}" y2="${ay}" stroke="var(--warn)" stroke-dasharray="4 4" stroke-width="1.5"/>${dots}
+    <text x="${Lm+4}" y="${ay-6}" style="fill:var(--warn)">ort. ${nf(avg,2)}</text></svg>`;
 }
 
 function drawChart(iv){
