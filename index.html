@@ -133,9 +133,10 @@ footer p{margin:0 0 6px;max-width:70ch}
 
   <form id="form" hidden>
     <div class="field"><label class="label" for="f-date">Tarih</label><input id="f-date" type="date" required></div>
-    <div class="field"><label class="label" for="f-start">Başlangıç %</label><input id="f-start" type="number" min="0" max="100" step="1" inputmode="numeric" required></div>
-    <div class="field"><label class="label" for="f-end">Bitiş %</label><input id="f-end" type="number" min="0" max="100" step="1" inputmode="numeric" required></div>
-    <div class="field"><label class="label" for="f-odo">Kilometre</label><input id="f-odo" type="number" min="0" step="1" inputmode="numeric" required></div>
+    <div class="field"><label class="label" for="f-time">Saat</label><input id="f-time" type="time"></div>
+    <div class="field"><label class="label" for="f-start">Başlangıç %</label><input id="f-start" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+    <div class="field"><label class="label" for="f-end">Bitiş %</label><input id="f-end" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+    <div class="field"><label class="label" for="f-odo">Kilometre</label><input id="f-odo" type="number" min="0" step="1" inputmode="numeric"></div>
     <div class="field"><label class="label" for="f-kwh">Şarj edilen kWh</label><input id="f-kwh" type="text" inputmode="decimal" placeholder="72,28" required></div>
     <div class="field"><label class="label" for="f-tl">Tutar (TL)</label><input id="f-tl" type="text" inputmode="decimal" placeholder="362,85" required></div>
     <div class="field wide"><label class="label" for="f-note">Not (istasyon vb., isteğe bağlı)</label><input id="f-note" type="text" style="font-family:var(--body)"></div>
@@ -173,6 +174,7 @@ footer p{margin:0 0 6px;max-width:70ch}
   </section>
 
   <footer>
+    <p>Yüzde veya kilometresi girilmemiş şarjlar toplam kWh ve TL'ye katılır, ama tüketim hesabında atlanır; o şarjın öncesindeki ve sonrasındaki yol hesaplanmaz.</p>
     <p><b>Nasıl hesaplanıyor:</b> Yol, bu şarjdaki km ile bir önceki şarjdaki km farkıdır. Bu yolda harcanan enerji, önceki şarjın bitiş yüzdesi ile bu şarjın başlangıç yüzdesi arasındaki fark × 89,5 kWh olarak alınır.</p>
     <p>Verim, bataryaya giren enerjinin (eklenen % × 89,5) istasyonda ödenen kWh'e oranıdır; şarj kaybını gösterir. TL/100 km, harcanan enerjiyi o yolu yapan önceki şarjın bataryaya giren kWh başına maliyetiyle çarpar.</p>
   </footer>
@@ -191,6 +193,9 @@ const fmtDate = iso => { const [y,m,d] = iso.split("-"); return `${d}.${m}.${y}`
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k,v); } catch {} } };
 const token = () => ls.get("gh_token");
+const has = v => v !== null && v !== undefined && v !== "" && isFinite(v);
+const full = r => has(r.start) && has(r.end) && has(r.odo);
+const chrono = (a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||"") || ((has(a.odo)?a.odo:0) - (has(b.odo)?b.odo:0));
 
 // UTF-8 güvenli base64
 const b64enc = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => bin += String.fromCharCode(x)); return btoa(bin); };
@@ -230,7 +235,7 @@ async function load(){
 
 async function commit(newRows, message){
   if (!token()) throw new Error("Önce Ayarlar'dan GitHub token'ı gir.");
-  const sorted = [...newRows].sort((a,b) => a.odo - b.odo);
+  const sorted = [...newRows].sort(chrono);
   const content = JSON.stringify({sarjlar: sorted}, null, 2) + "\n";
   try {
     const j = await gh("PUT", {message, content: b64enc(content), sha});
@@ -248,11 +253,11 @@ function showBanner(text, err, tokenBtn){
 }
 
 function compute(list){
-  const s = [...list].sort((a,b) => a.odo - b.odo || a.date.localeCompare(b.date));
+  const s = [...list].sort(chrono);
   return s.map((r,i) => {
-    const added = (r.end - r.start) / 100 * CAP;
-    const o = {...r, added, eff: r.kwh > 0 ? added / r.kwh : null, unit: r.kwh > 0 ? r.tl / r.kwh : null};
-    if (i > 0) {
+    const added = has(r.start) && has(r.end) ? (r.end - r.start) / 100 * CAP : null;
+    const o = {...r, added, eff: added != null && r.kwh > 0 ? added / r.kwh : null, unit: r.kwh > 0 ? r.tl / r.kwh : null};
+    if (i > 0 && full(r) && full(s[i-1])) {
       const p = s[i-1];
       o.dist = r.odo - p.odo;
       o.used = (p.end - r.start) / 100 * CAP;
@@ -276,9 +281,9 @@ function render(){
     const avgC = consVals.length ? consVals.reduce((a,b)=>a+b,0)/consVals.length : null;
     tb.innerHTML = c.slice().reverse().map(r => `
       <tr data-id="${esc(r.id)}" tabindex="0">
-        <td class="date">${fmtDate(r.date)}${r.note ? `<div class="dim" style="font-weight:400;font-size:12px">${esc(r.note)}</div>` : ""}</td>
-        <td><span class="soc"><span class="socbar"><i style="left:${r.start}%;width:${Math.max(0,r.end-r.start)}%"></i></span>%${r.start} → %${r.end}</span></td>
-        <td>${r.odo.toLocaleString("tr-TR")}</td>
+        <td class="date">${fmtDate(r.date)}${r.time ? ` <span class="dim" style="font-weight:400;font-size:12px">${esc(r.time)}</span>` : ""}${r.note ? `<div class="dim" style="font-weight:400;font-size:12px">${esc(r.note)}</div>` : ""}</td>
+        <td>${has(r.start) && has(r.end) ? `<span class="soc"><span class="socbar"><i style="left:${r.start}%;width:${Math.max(0,r.end-r.start)}%"></i></span>%${r.start} → %${r.end}</span>` : '<span class="dim">% girilmedi</span>'}</td>
+        <td>${has(r.odo) ? r.odo.toLocaleString("tr-TR") : '<span class="dim">—</span>'}</td>
         <td>${r.dist != null ? r.dist.toLocaleString("tr-TR") + " km" : '<span class="dim">—</span>'}</td>
         <td>${nf(r.kwh,2)}</td>
         <td>${nf(r.tl,2)} ₺</td>
@@ -298,7 +303,7 @@ function render(){
   $("s-cost").innerHTML = costDist ? `${nf(costSum/costDist*100,0)}<small>₺</small>` : "—";
   $("s-price").innerHTML = tKwh ? `${nf(tTl/tKwh,2)}<small>₺/kWh</small>` : "—";
   $("s-tot").innerHTML = c.length ? `${nf(tTl,0)}<small>₺</small>` : "—";
-  $("s-totn").textContent = c.length ? `${c.length} şarj · ${nf(tKwh,1)} kWh · ${(c.at(-1).odo - c[0].odo).toLocaleString("tr-TR")} km` : "—";
+  $("s-totn").textContent = c.length ? `${c.length} şarj · ${nf(tKwh,1)} kWh · ${(() => { const o = c.filter(r => has(r.odo)).map(r => r.odo); return o.length > 1 ? (Math.max(...o) - Math.min(...o)).toLocaleString("tr-TR") + " km" : "km yok"; })()}` : "—";
   drawChart(iv);
 }
 
@@ -331,9 +336,10 @@ function openForm(r){
   editingId = r ? r.id : null; delArmed = false;
   $("form").hidden = false;
   $("f-date").value = r ? r.date : new Date().toISOString().slice(0,10);
-  $("f-start").value = r ? r.start : "";
-  $("f-end").value = r ? r.end : "";
-  $("f-odo").value = r ? r.odo : "";
+  $("f-time").value = r ? (r.time || "") : "";
+  $("f-start").value = r && has(r.start) ? r.start : "";
+  $("f-end").value = r && has(r.end) ? r.end : "";
+  $("f-odo").value = r && has(r.odo) ? r.odo : "";
   $("f-kwh").value = r ? String(r.kwh).replace(".",",") : "";
   $("f-tl").value = r ? String(r.tl).replace(".",",") : "";
   $("f-note").value = r ? (r.note || "") : "";
@@ -363,14 +369,16 @@ $("rows").addEventListener("keydown", e => { if (e.key === "Enter") { const tr =
 
 $("form").addEventListener("submit", async e => {
   e.preventDefault(); if (busy) return;
+  const opt = v => { const n = parseNum(v); return isFinite(n) ? n : null; };
   const d = {
-    date: $("f-date").value,
-    start: parseNum($("f-start").value), end: parseNum($("f-end").value),
-    odo: parseNum($("f-odo").value), kwh: parseNum($("f-kwh").value), tl: parseNum($("f-tl").value),
+    date: $("f-date").value, time: $("f-time").value || "",
+    start: opt($("f-start").value), end: opt($("f-end").value),
+    odo: opt($("f-odo").value), kwh: parseNum($("f-kwh").value), tl: parseNum($("f-tl").value),
     note: $("f-note").value.trim()
   };
-  if ([d.start,d.end,d.odo,d.kwh,d.tl].some(v => !isFinite(v)) || !d.date) { setMsg("Tüm sayısal alanları doldur.", true); return; }
-  if (d.end <= d.start) { setMsg("Bitiş yüzdesi başlangıçtan büyük olmalı.", true); return; }
+  if (!d.date || !isFinite(d.kwh) || !isFinite(d.tl)) { setMsg("Tarih, kWh ve tutar zorunlu.", true); return; }
+  if ((d.start == null) !== (d.end == null)) { setMsg("Yüzdeleri ikisini birden gir ya da ikisini de boş bırak.", true); return; }
+  if (d.start != null && d.end <= d.start) { setMsg("Bitiş yüzdesi başlangıçtan büyük olmalı.", true); return; }
   busy = true; $("saveBtn").disabled = true; setMsg("GitHub'a kaydediliyor…");
   try {
     if (editingId) await commit(rows.map(r => r.id === editingId ? {id: editingId, ...d} : r), `Şarj güncellendi: ${d.date}`);

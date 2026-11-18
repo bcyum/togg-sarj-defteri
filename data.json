@@ -1,8 +1,25 @@
 {
   "sarjlar": [
-    { "id": "2026-10-14", "date": "2026-10-14", "start": 29, "end": 100, "odo": 1300, "kwh": 73.08, "tl": 366.85, "note": "" },
-    { "id": "2026-10-22", "date": "2026-10-22", "start": 18, "end": 90, "odo": 1608, "kwh": 72.28, "tl": 362.85, "note": "" },
-    { "id": "2026-10-28", "date": "2026-10-28", "start": 44, "end": 82, "odo": 1814, "kwh": 38.35, "tl": 192.5, "note": "" },
-    { "id": "2026-10-29", "date": "2026-10-29", "start": 60, "end": 100, "odo": 1923, "kwh": 36.9, "tl": 314.39, "note": "" }
+    {"id": "NIV2026000255221", "date": "2026-09-18", "time": "10:56", "start": null, "end": null, "odo": null, "kwh": 77.01, "tl": 762.4, "note": "Neva · NIV2026000255221"},
+    {"id": "NIV2026000262617", "date": "2026-09-25", "time": "15:28", "start": null, "end": null, "odo": null, "kwh": 78.8, "tl": 1095.32, "note": "Neva · NIV2026000262617"},
+    {"id": "NIV2026000273322", "date": "2026-10-05", "time": "09:12", "start": null, "end": null, "odo": null, "kwh": 29.13, "tl": 288.39, "note": "Neva · NIV2026000273322"},
+    {"id": "2026-10-14", "date": "2026-10-14", "start": 29, "end": 100, "odo": 1300, "kwh": 73.08, "tl": 366.85, "note": ""},
+    {"id": "NIV2026000284955", "date": "2026-10-16", "time": "17:01", "start": null, "end": null, "odo": null, "kwh": 44.43, "tl": 617.58, "note": "Neva · NIV2026000284955"},
+    {"id": "2026-10-22", "date": "2026-10-22", "start": 18, "end": 90, "odo": 1608, "kwh": 72.28, "tl": 362.85, "note": ""},
+    {"id": "2026-10-28", "date": "2026-10-28", "start": 44, "end": 82, "odo": 1814, "kwh": 38.35, "tl": 192.5, "note": ""},
+    {"id": "2026-10-29", "date": "2026-10-29", "start": 60, "end": 100, "odo": 1923, "kwh": 36.9, "tl": 314.39, "note": ""},
+    {"id": "WMA2026000810950", "date": "2026-10-31", "time": "18:29", "start": null, "end": null, "odo": null, "kwh": 53.33, "tl": 639.41, "note": "WAT · WMA2026000810950"},
+    {"id": "EZE2026000428933", "date": "2026-11-01", "time": "", "start": null, "end": null, "odo": null, "kwh": 18.1, "tl": 154.21, "note": "Zeplin · EZE2026000428933"},
+    {"id": "EZE2026000429021", "date": "2026-11-01", "time": "", "start": null, "end": null, "odo": null, "kwh": 23.5, "tl": 200.22, "note": "Zeplin · EZE2026000429021"},
+    {"id": "TAA2026003206604", "date": "2026-11-08", "time": "", "start": null, "end": null, "odo": null, "kwh": 23.587, "tl": 282.59, "note": "Trugo · TAA2026003206604"},
+    {"id": "TAA2026003278032", "date": "2026-11-14", "time": "", "start": null, "end": null, "odo": null, "kwh": 67.769, "tl": 811.93, "note": "Trugo · TAA2026003278032"},
+    {"id": "TAA2026003319600", "date": "2026-11-16", "time": "20:46", "start": null, "end": null, "odo": null, "kwh": 4.03, "tl": 48.28, "note": "Trugo · TAA2026003319600"},
+    {"id": "TAA2026003319717", "date": "2026-11-16", "time": "20:56", "start": null, "end": null, "odo": null, "kwh": 1.47, "tl": 17.61, "note": "Trugo · TAA2026003319717"},
+    {"id": "TAA2026003319724", "date": "2026-11-16", "time": "21:00", "start": null, "end": null, "odo": null, "kwh": 1.01, "tl": 12.1, "note": "Trugo · TAA2026003319724"},
+    {"id": "TAA2026003319800", "date": "2026-11-16", "time": "21:03", "start": null, "end": null, "odo": null, "kwh": 1.52, "tl": 18.22, "note": "Trugo · TAA2026003319800"},
+    {"id": "TAA2026003320217", "date": "2026-11-16", "time": "21:38", "start": null, "end": null, "odo": null, "kwh": 34.417, "tl": 412.34, "note": "Trugo · TAA2026003320217"},
+    {"id": "TAA2026003321759", "date": "2026-11-17", "time": "00:39", "start": null, "end": null, "odo": null, "kwh": 14.204, "tl": 170.18, "note": "Trugo · TAA2026003321759"},
+    {"id": "TAA2026003324621", "date": "2026-11-17", "time": "11:46", "start": null, "end": null, "odo": null, "kwh": 11.47, "tl": 137.42, "note": "Trugo · TAA2026003324621"},
+    {"id": "NIV2026000322814", "date": "2026-11-17", "time": "13:38", "start": null, "end": null, "odo": null, "kwh": 34.65, "tl": 343.04, "note": "Neva · NIV2026000322814"}
   ]
 }
