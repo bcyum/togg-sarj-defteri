@@ -93,9 +93,9 @@
     {
       "id": "WMA2026000810950",
       "date": "2026-10-31",
-      "start": null,
-      "end": null,
-      "odo": null,
+      "start": 28,
+      "end": 85,
+      "odo": 2233,
       "kwh": 53.33,
       "tl": 639.41,
       "note": "WAT · WMA2026000810950"
