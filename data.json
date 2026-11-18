@@ -43,9 +43,9 @@
     {
       "id": "NIV2026000273322",
       "date": "2026-10-05",
-      "start": null,
-      "end": null,
-      "odo": null,
+      "start": 72,
+      "end": 100,
+      "odo": 910,
       "kwh": 29.13,
       "tl": 288.39,
       "note": "Neva · NIV2026000273322"
