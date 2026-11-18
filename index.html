@@ -59,41 +59,50 @@ h2{font-family:var(--display);font-size:18px;font-weight:700;margin:0}
 .sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .hint{color:var(--muted);font-size:13px;margin:0}
 .chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
-.chart svg{display:block;width:100%;min-width:300px;height:auto}
+.chart svg{display:block;width:100%;height:auto}
 .chart text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 .chart .val{fill:var(--fg);font-weight:500}
-.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;min-width:820px;font-variant-numeric:tabular-nums}
-th,td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
-th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
-th:first-child,td:first-child{text-align:left}
-td{font-family:var(--mono);font-size:13.5px}
-td.date{font-family:var(--body);font-weight:600;font-size:14px}
-tbody tr[data-id]{cursor:pointer}
-tbody tr[data-id]:hover td{background:var(--accent-soft)}
-tbody tr:last-child td{border-bottom:0}
+.charts2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+@media (max-width:720px){.charts2{grid-template-columns:1fr}}
+.charts2 section{min-width:0}
+.chart .lab{fill:var(--fg)}
+.hov:hover rect[fill="transparent"]{fill:var(--accent-soft);opacity:.5}
+.prov{display:flex;flex-direction:column;gap:14px}
+.pr{display:grid;grid-template-columns:84px minmax(0,1fr) auto;column-gap:10px;row-gap:2px;align-items:center}
+.pn{font-weight:600;font-size:14px}
+.pb{height:12px;background:var(--line);border-radius:0 4px 4px 0;overflow:hidden}
+.pb i{display:block;height:100%;background:var(--bar);border-radius:0 4px 4px 0}
+.pv{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.ps{grid-column:2/4;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 .sectog{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:700;border-radius:6px}
 .sectog:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .sectog .cnt{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--muted)}
-.chev{display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;transition:transform .15s}
-.closed>.chev,.sectog.closed .chev{transform:rotate(-90deg)}
+.chev{display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;transition:transform .15s;flex:none}
+.sectog.closed .chev,.mclosed .chev{transform:rotate(-90deg)}
 .hbtn{font-size:13px;padding:6px 10px;font-weight:600}
-tr.mhead td{padding:0;background:var(--bg);border-bottom:1px solid var(--line)}
-tr.mhead button{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;padding:11px 12px}
-tr.mhead button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-tr.mhead button:hover{background:var(--accent-soft)}
-tr.mhead .in{position:sticky;left:12px;display:inline-flex;align-items:baseline;column-gap:12px;row-gap:2px;flex-wrap:wrap;max-width:calc(100vw - 32px - 26px)}
-tr.mhead .mn{font-family:var(--display);font-weight:700;font-size:15px;color:var(--fg);display:inline-flex;align-items:center;gap:8px}
-tr.mhead .ms{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
-tbody.mclosed tr.r{display:none}
-tbody.month:last-child tr:last-child td{border-bottom:0}
-@media (prefers-reduced-motion: reduce){.chev{transition:none}}
-.soc{display:inline-flex;align-items:center;gap:8px}
-.socbar{position:relative;width:56px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
-.socbar i{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.reclist{display:flex;flex-direction:column;gap:10px}
+.month{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.mhead{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:2px;padding:12px 14px;background:var(--bg)}
+.mhead:hover{background:var(--accent-soft)}
+.mhead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.mn{font-family:var(--display);font-weight:700;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.mt{font-family:var(--mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums;text-align:right}
+.ms{grid-column:1/-1;font-family:var(--mono);font-size:12px;color:var(--muted);padding-left:18px}
+.mclosed .mrows{display:none}
+.mrows{border-top:1px solid var(--line)}
+.rec{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:11px 14px;border-top:1px solid var(--line)}
+.rec:first-child{border-top:0}
+.rec:hover{background:var(--accent-soft)}
+.rec:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.rl,.rr{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rr{align-items:flex-end;text-align:right;flex:none}
+.rd{font-weight:700;font-size:15px}
+.wd{font-weight:400;font-size:12.5px;color:var(--muted)}
+.rs{font-size:12.5px;color:var(--muted);line-height:1.45}
+.rtl{font-family:var(--mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.rr .rs{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
 .dim{color:var(--muted)}
-.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:12px;background:var(--accent-soft);color:var(--accent)}
-.pill.hi{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.pill{display:inline-block;padding:0 7px;border-radius:999px;font-size:11.5px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 form,.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:640px){form{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .panel{grid-template-columns:1fr}
@@ -165,15 +174,31 @@ footer p{margin:0 0 6px;max-width:70ch}
     </div>
   </form>
 
-  <div class="stats" id="stats">
-    <div class="stat"><span class="label">Ort. tüketim</span><span class="v" id="s-cons">—</span><span class="n">şarjlar arası, batarya</span></div>
-    <div class="stat"><span class="label">100 km maliyeti</span><span class="v" id="s-cost">—</span><span class="n">tahmini</span></div>
-    <div class="stat"><span class="label">Ort. birim fiyat</span><span class="v" id="s-price">—</span><span class="n">toplam TL ÷ toplam kWh</span></div>
-    <div class="stat"><span class="label">Toplam</span><span class="v" id="s-tot">—</span><span class="n" id="s-totn">—</span></div>
+<div class="stats" id="stats">
+    <div class="stat"><span class="label">Toplam şarj harcaması</span><span class="v" id="s-tot">—</span><span class="n" id="s-totn">—</span></div>
+    <div class="stat"><span class="label">Güncel km</span><span class="v" id="s-km">—</span><span class="n" id="s-kmn">—</span></div>
+    <div class="stat"><span class="label">Km başına maliyet</span><span class="v" id="s-perkm">—</span><span class="n" id="s-perkmn">—</span></div>
+    <div class="stat"><span class="label">Ort. birim fiyat</span><span class="v" id="s-price">—</span><span class="n">toplam ₺ ÷ toplam kWh</span></div>
+  </div>
+
+  <div class="charts2">
+    <section>
+      <div class="sechead"><h2>Aylık harcama</h2></div>
+      <div class="chart" id="chartMonth"></div>
+    </section>
+    <section>
+      <div class="sechead"><h2>Firmalara göre ₺/kWh</h2><p class="hint">Ucuzdan pahalıya</p></div>
+      <div class="chart" id="chartProv"></div>
+    </section>
   </div>
 
   <section>
-    <div class="sechead"><h2>Tüketim (kWh / 100 km)</h2><p class="hint">Her çubuk iki şarj arasındaki yolu gösterir</p></div>
+    <div class="sechead"><h2>Toplam harcama zamanla</h2><p class="hint">Her nokta bir şarj; üzerine gelince detay</p></div>
+    <div class="chart" id="chartCum"></div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Tüketim (kWh / 100 km)</h2><p class="hint">Yüzde ve km'si girilmiş ardışık şarjlar arası</p></div>
     <div class="chart" id="chart"><div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div></div>
   </section>
 
@@ -183,19 +208,13 @@ footer p{margin:0 0 6px;max-width:70ch}
       <div class="hbtns" id="monthBtns"><button type="button" class="hbtn" id="allOpen">Tüm ayları aç</button><button type="button" class="hbtn" id="allClose">Tümünü kapat</button></div>
     </div>
     <div id="recBody">
-    <p class="hint" style="margin-bottom:8px">Aya dokunarak aç/kapat, düzenlemek için satıra dokun</p>
-    <div class="tablebox">
-      <table id="tbl">
-        <thead><tr>
-          <th>Tarih</th><th>Şarj</th><th>Km</th><th>Yol</th><th>kWh</th><th>Tutar</th><th>TL/kWh</th><th>Verim</th><th>kWh/100 km</th><th>TL/100 km</th>
-        </tr></thead>
-        <tbody id="rows"><tr><td colspan="10" class="empty">Kayıtlar yükleniyor…</td></tr></tbody>
-      </table>
-    </div>
+      <p class="hint" style="margin-bottom:8px">Aya dokunarak aç/kapat; detay ve düzenleme için şarja dokun</p>
+      <div class="reclist" id="recList"><div class="empty">Kayıtlar yükleniyor…</div></div>
     </div>
   </section>
 
   <footer>
+    <p><b>Km başına maliyet:</b> Tüm şarjlara ödenen toplam tutar, en son girilen kilometreye bölünür. 100 km'deki kWh da aynı şekilde şarj edilen toplam kWh'ten hesaplanır; şarj kaybını da içerir.</p>
     <p>Yüzde veya kilometresi girilmemiş şarjlar toplam kWh ve TL'ye katılır, ama tüketim hesabında atlanır; o şarjın öncesindeki ve sonrasındaki yol hesaplanmaz.</p>
     <p><b>Nasıl hesaplanıyor:</b> Yol, bu şarjdaki km ile bir önceki şarjdaki km farkıdır. Bu yolda harcanan enerji, önceki şarjın bitiş yüzdesi ile bu şarjın başlangıç yüzdesi arasındaki fark × 89,5 kWh olarak alınır.</p>
     <p>Verim, bataryaya giren enerjinin (eklenen % × 89,5) istasyonda ödenen kWh'e oranıdır; şarj kaybını gösterir. TL/100 km, harcanan enerjiyi o yolu yapan önceki şarjın bataryaya giren kWh başına maliyetiyle çarpar.</p>
@@ -251,7 +270,7 @@ async function load(){
     render();
   } catch (e) {
     if (rows.length) { render(); showBanner(`Güncel liste alınamadı, son kaydedilen gösteriliyor. ${e.message}`, true, e.status === 401); }
-    else { $("tbl").querySelectorAll("tbody.month").forEach(x => x.remove()); $("rows").innerHTML = `<tr><td colspan="10" class="empty">${esc(e.message)}</td></tr>`; showBanner(e.message, true, e.status === 401); }
+    else { $("recList").innerHTML = `<div class="empty">${esc(e.message)}</div>`; showBanner(e.message, true, e.status === 401); }
   }
 }
 
@@ -293,63 +312,124 @@ function compute(list){
   });
 }
 
+const PROV = [["zeplin","Zeplin"],["trugo","Trugo"],["neva","Neva"],["wat","WAT"],["mycharge","MyCharge"]];
+function prov(r){ const n = (r.note || "").toLocaleLowerCase("tr-TR"); for (const [k,v] of PROV) if (new RegExp("(^|[^a-z])" + k + "([^a-z]|$)").test(n)) return v; return "Diğer"; }
+const monthName = k => { const [y,mo] = k.split("-").map(Number); const s = new Date(y, mo-1, 1).toLocaleDateString("tr-TR", {month:"long", year:"numeric"}); return s.charAt(0).toLocaleUpperCase("tr-TR") + s.slice(1); };
+const monthShort = k => { const [y,mo] = k.split("-").map(Number); return new Date(y, mo-1, 1).toLocaleDateString("tr-TR", {month:"short"}); };
+const dayLabel = iso => { const [y,m,d] = iso.split("-").map(Number); return `${String(d).padStart(2,"0")}.${String(m).padStart(2,"0")} <span class="wd">${new Date(y,m-1,d).toLocaleDateString("tr-TR",{weekday:"short"})}</span>`; };
+
 function render(){
   const c = compute(rows);
-  const tb = $("rows");
+  const list = $("recList");
+  const tKwh = c.reduce((a,r)=>a+r.kwh,0), tTl = c.reduce((a,r)=>a+r.tl,0);
+  const withKm = c.filter(r => has(r.odo));
+  const last = withKm.at(-1);
+  // Özet
+  $("s-tot").innerHTML = c.length ? `${nf(tTl,2)}<small>₺</small>` : "—";
+  $("s-totn").textContent = c.length ? `${c.length} şarj · ${nf(tKwh,1)} kWh` : "Henüz şarj yok";
+  $("s-km").innerHTML = last ? `${last.odo.toLocaleString("tr-TR")}<small>km</small>` : "—";
+  $("s-kmn").textContent = last ? `${fmtDate(last.date)} şarjında girilen km` : "Hiçbir şarjda km girilmedi";
+  $("s-perkm").innerHTML = last && last.odo > 0 ? `${nf(tTl/last.odo,2)}<small>₺/km</small>` : "—";
+  $("s-perkmn").textContent = last && last.odo > 0 ? `100 km ≈ ${nf(tTl/last.odo*100,0)} ₺ · ${nf(tKwh/last.odo*100,1)} kWh` : "Km girilince hesaplanır";
+  $("s-price").innerHTML = tKwh ? `${nf(tTl/tKwh,2)}<small>₺/kWh</small>` : "—";
+
   if (!c.length) {
-    $("tbl").querySelectorAll("tbody.month").forEach(x => x.remove()); $("recCnt").textContent = "";
-    tb.innerHTML = `<tr><td colspan="10" class="empty">Henüz kayıt yok. İlk şarjı “+ Şarj ekle” ile gir.</td></tr>`;
+    list.innerHTML = `<div class="empty">Henüz kayıt yok. İlk şarjı “+ Şarj ekle” ile gir.</div>`; $("recCnt").textContent = "";
   } else {
-    const consVals = c.filter(r => r.cons != null).map(r => r.cons);
-    avgC = consVals.length ? consVals.reduce((a,b)=>a+b,0)/consVals.length : null;
     const months = [];
     c.forEach(r => { const k = r.date.slice(0,7); let m = months.at(-1); if (!m || m.k !== k) months.push(m = {k, list: []}); m.list.push(r); });
-    let open = openMonths();
-    if (!open) open = [months.at(-1).k];
-    tb.innerHTML = "";
-    $("tbl").querySelectorAll("tbody.month").forEach(x => x.remove());
-    $("tbl").insertAdjacentHTML("beforeend", months.map(m => {
+    let open = openMonths(); if (!open) open = [months.at(-1).k];
+    list.innerHTML = months.map(m => {
       const kwh = m.list.reduce((a,r)=>a+r.kwh,0), tl = m.list.reduce((a,r)=>a+r.tl,0);
-      const [y,mo] = m.k.split("-").map(Number);
-      const name = new Date(y, mo-1, 1).toLocaleDateString("tr-TR", {month:"long", year:"numeric"});
       const isOpen = open.includes(m.k);
-      return `<tbody class="month${isOpen ? "" : " mclosed"}" data-m="${m.k}">
-        <tr class="mhead"><td colspan="10"><button type="button" aria-expanded="${isOpen}"><span class="in"><span class="mn${isOpen ? "" : " closed"}"><span class="chev"></span>${name.charAt(0).toLocaleUpperCase("tr-TR") + name.slice(1)}</span><span class="ms">${m.list.length} şarj · ${nf(kwh,1)} kWh · ${nf(tl,2)} ₺ · ${nf(tl/kwh,2)} ₺/kWh</span></span></button></td></tr>
-        ${m.list.map(rowHtml).join("")}</tbody>`;
-    }).join(""));
+      return `<div class="month${isOpen ? "" : " mclosed"}" data-m="${m.k}">
+        <button type="button" class="mhead" aria-expanded="${isOpen}"><span class="mn"><span class="chev"></span>${monthName(m.k)}</span><span class="mt">${nf(tl,2)} ₺</span><span class="ms">${m.list.length} şarj · ${nf(kwh,1)} kWh · ort. ${nf(tl/kwh,2)} ₺/kWh</span></button>
+        <div class="mrows">${m.list.map(recHtml).join("")}</div></div>`;
+    }).join("");
     $("recCnt").textContent = `${c.length} kayıt · ${months.length} ay`;
   }
-  function rowHtml(r){ return `
-      <tr class="r" data-id="${esc(r.id)}" tabindex="0">
-        <td class="date">${fmtDate(r.date)}${r.time ? ` <span class="dim" style="font-weight:400;font-size:12px">${esc(r.time)}</span>` : ""}${r.note ? `<div class="dim" style="font-weight:400;font-size:12px">${esc(r.note)}</div>` : ""}</td>
-        <td>${has(r.start) && has(r.end) ? `<span class="soc"><span class="socbar"><i style="left:${r.start}%;width:${Math.max(0,r.end-r.start)}%"></i></span>%${r.start} → %${r.end}</span>` : '<span class="dim">% girilmedi</span>'}</td>
-        <td>${has(r.odo) ? r.odo.toLocaleString("tr-TR") : '<span class="dim">—</span>'}</td>
-        <td>${r.dist != null ? r.dist.toLocaleString("tr-TR") + " km" : '<span class="dim">—</span>'}</td>
-        <td>${nf(r.kwh,2)}</td>
-        <td>${nf(r.tl,2)} ₺</td>
-        <td>${r.unit != null ? nf(r.unit,2) : "—"}</td>
-        <td>${r.eff != null ? "%" + nf(r.eff*100,0) : "—"}</td>
-        <td>${r.cons != null ? `<span class="pill${avgC && r.cons > avgC*1.1 ? " hi" : ""}">${nf(r.cons,1)}</span>` : '<span class="dim">—</span>'}</td>
-        <td>${r.cost != null ? nf(r.cost,0) + " ₺" : '<span class="dim">—</span>'}</td>
-      </tr>`; }
 
   const iv = c.filter(r => r.cons != null);
-  const dist = iv.reduce((a,r)=>a+r.dist,0), used = iv.reduce((a,r)=>a+r.used,0);
-  const costIv = iv.filter(r => r.cost != null);
-  const costSum = costIv.reduce((a,r)=>a + r.cost*r.dist/100,0), costDist = costIv.reduce((a,r)=>a+r.dist,0);
-  const tKwh = c.reduce((a,r)=>a+r.kwh,0), tTl = c.reduce((a,r)=>a+r.tl,0);
-  $("s-cons").innerHTML = dist ? `${nf(used/dist*100,1)}<small>kWh</small>` : "—";
-  $("s-cost").innerHTML = costDist ? `${nf(costSum/costDist*100,0)}<small>₺</small>` : "—";
-  $("s-price").innerHTML = tKwh ? `${nf(tTl/tKwh,2)}<small>₺/kWh</small>` : "—";
-  $("s-tot").innerHTML = c.length ? `${nf(tTl,0)}<small>₺</small>` : "—";
-  $("s-totn").textContent = c.length ? `${c.length} şarj · ${nf(tKwh,1)} kWh · ${(() => { const o = c.filter(r => has(r.odo)).map(r => r.odo); return o.length > 1 ? (Math.max(...o) - Math.min(...o)).toLocaleString("tr-TR") + " km" : "km yok"; })()}` : "—";
   drawChart(iv);
+  drawMonthly(c); drawProviders(c); drawCumulative(c);
+}
+
+function recHtml(r){
+  const bits = [esc(prov(r) === "Diğer" ? (r.note || "Not yok") : prov(r))];
+  if (has(r.start) && has(r.end)) bits.push(`%${r.start}→%${r.end}`);
+  if (has(r.odo)) bits.push(`${r.odo.toLocaleString("tr-TR")} km`);
+  if (r.cons != null) bits.push(`<span class="pill">${nf(r.cons,1)} kWh/100 km</span>`);
+  return `<button type="button" class="rec" data-id="${esc(r.id)}">
+    <span class="rl"><span class="rd">${dayLabel(r.date)}${r.time ? ` <span class="wd">${esc(r.time)}</span>` : ""}</span><span class="rs">${bits.join(" · ")}</span></span>
+    <span class="rr"><span class="rtl">${nf(r.tl,2)} ₺</span><span class="rs">${nf(r.kwh,2)} kWh · ${r.unit != null ? nf(r.unit,2) : "—"} ₺/kWh</span></span>
+  </button>`;
+}
+
+function drawMonthly(c){
+  const box = $("chartMonth");
+  const ms = [];
+  c.forEach(r => { const k = r.date.slice(0,7); let m = ms.at(-1); if (!m || m.k !== k) ms.push(m = {k, tl:0, kwh:0, n:0}); m.tl += r.tl; m.kwh += r.kwh; m.n++; });
+  if (!ms.length) { box.innerHTML = `<div class="empty">Kayıt yok.</div>`; return; }
+  const W = Math.max(300, box.clientWidth - 30), H = 230, Lm = 48, R = 8, T = 24, B = 40;
+  const max = Math.max(...ms.map(m => m.tl));
+  const stepRaw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(stepRaw))), step = [1,2,2.5,5,10].map(s=>s*mag).find(s => s >= stepRaw);
+  const top = Math.ceil(max/step)*step;
+  const y = v => T + (H-T-B) * (1 - v/top);
+  const slot = (W-Lm-R)/ms.length, bw = Math.min(64, slot*0.62);
+  let g = "";
+  for (let v=0; v<=top+1e-9; v+=step) g += `<line x1="${Lm}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${Lm-6}" y="${y(v)+4}" text-anchor="end">${nf(v,0)}</text>`;
+  const bars = ms.map((m,i) => { const cx = Lm + slot*i + slot/2, yy = y(m.tl), h = y(0)-yy;
+    return `<g class="hov"><title>${monthName(m.k)}: ${nf(m.tl,2)} ₺ · ${nf(m.kwh,1)} kWh · ${m.n} şarj</title>
+      <rect x="${Lm + slot*i}" y="${T}" width="${slot}" height="${H-T-B}" fill="transparent"/>
+      <path d="M${cx-bw/2},${y(0)} V${yy+4} q0,-4 4,-4 H${cx+bw/2-4} q4,0 4,4 V${y(0)} Z" fill="var(--bar)"/>
+      <text class="val" x="${cx}" y="${yy-7}" text-anchor="middle">${nf(m.tl,0)} ₺</text>
+      <text x="${cx}" y="${H-B+16}" text-anchor="middle" class="lab">${monthShort(m.k)}</text>
+      <text x="${cx}" y="${H-B+31}" text-anchor="middle">${nf(m.kwh,0)} kWh</text></g>`; }).join("");
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Aylık şarj harcaması">${g}${bars}</svg>`;
+}
+
+function drawProviders(c){
+  const box = $("chartProv");
+  const m = new Map();
+  c.forEach(r => { const k = prov(r); const o = m.get(k) || {k, tl:0, kwh:0, n:0}; o.tl += r.tl; o.kwh += r.kwh; o.n++; m.set(k, o); });
+  const arr = [...m.values()].filter(o => o.kwh > 0).sort((a,b) => a.tl/a.kwh - b.tl/b.kwh);
+  if (!arr.length) { box.innerHTML = `<div class="empty">Kayıt yok.</div>`; return; }
+  const max = Math.max(...arr.map(o => o.tl/o.kwh));
+  box.innerHTML = `<div class="prov">${arr.map(o => `<div class="pr" title="${esc(o.k)}: ${o.n} şarj · ${nf(o.kwh,1)} kWh · ${nf(o.tl,2)} ₺">
+      <span class="pn">${esc(o.k)}</span>
+      <span class="pb"><i style="width:${(o.tl/o.kwh)/max*100}%"></i></span>
+      <span class="pv">${nf(o.tl/o.kwh,2)}</span>
+      <span class="ps">${o.n} şarj · ${nf(o.kwh,0)} kWh · ${nf(o.tl,0)} ₺</span></div>`).join("")}</div>`;
+}
+
+function drawCumulative(c){
+  const box = $("chartCum");
+  if (c.length < 2) { box.innerHTML = `<div class="empty">En az iki şarj gerekiyor.</div>`; return; }
+  const day = iso => { const [y,m,d] = iso.split("-").map(Number); return Date.UTC(y,m-1,d)/864e5; };
+  let cum = 0; const pts = c.map(r => ({x: day(r.date) + (r.time ? (+r.time.slice(0,2)*60 + +r.time.slice(3,5))/1440 : 0.5), v: (cum += r.tl), r}));
+  const W = Math.max(300, box.clientWidth - 30), H = 240, Lm = 48, R = 62, T = 16, B = 30;
+  const x0 = pts[0].x, x1 = pts.at(-1).x || x0+1, max = cum;
+  const stepRaw = max/4, mag = Math.pow(10, Math.floor(Math.log10(stepRaw))), step = [1,2,2.5,5,10].map(s=>s*mag).find(s => s >= stepRaw);
+  const top = Math.ceil(max/step)*step;
+  const X = v => Lm + (W-Lm-R) * (v - x0) / (x1 - x0 || 1), Y = v => T + (H-T-B) * (1 - v/top);
+  let g = "";
+  for (let v=0; v<=top+1e-9; v+=step) g += `<line x1="${Lm}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${Lm-6}" y="${Y(v)+4}" text-anchor="end">${nf(v,0)}</text>`;
+  const f = pts[0].r.date.split("-").map(Number); let d = new Date(Date.UTC(f[0], f[1], 1));
+  while (d.getTime()/864e5 <= x1) { const xv = X(d.getTime()/864e5); g += `<line x1="${xv}" x2="${xv}" y1="${T}" y2="${H-B}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${xv}" y="${H-B+18}" text-anchor="middle">${d.toLocaleDateString("tr-TR",{month:"short", timeZone:"UTC"})}</text>`; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+1, 1)); }
+  let path = `M${X(pts[0].x)},${Y(0)} `; let prev = 0;
+  pts.forEach(p => { path += `L${X(p.x)},${Y(prev)} L${X(p.x)},${Y(p.v)} `; prev = p.v; });
+  const area = path + `L${X(pts.at(-1).x)},${Y(0)} Z`;
+  const dots = pts.map(p => `<g class="hov"><title>${fmtDate(p.r.date)}${p.r.time ? " " + p.r.time : ""} · ${esc(prov(p.r))}: +${nf(p.r.tl,2)} ₺ → toplam ${nf(p.v,2)} ₺</title><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="9" fill="transparent"/><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="3" fill="var(--bar)" stroke="var(--surface)" stroke-width="1.5"/></g>`).join("");
+  const lp = pts.at(-1);
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Zaman içinde toplam şarj harcaması">${g}
+    <path d="${area}" fill="var(--accent-soft)" opacity=".6"/><path d="${path}" fill="none" stroke="var(--bar)" stroke-width="2" stroke-linejoin="round"/>${dots}
+    <text class="val" x="${X(lp.x)+8}" y="${Y(lp.v)+4}">${nf(lp.v,0)} ₺</text></svg>`;
 }
 
 function drawChart(iv){
   const box = $("chart");
   if (!iv.length) { box.innerHTML = `<div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div>`; return; }
-  const W = 640, H = 220, L = 34, R = 10, T = 22, B = 40;
+  const W = Math.max(300, box.clientWidth - 30), H = 220, L = 34, R = 10, T = 22, B = 40;
   const max = Math.max(...iv.map(r=>r.cons));
   const top = Math.ceil(max/5)*5 || 5;
   const step = top <= 40 ? 5 : 10;
@@ -404,16 +484,15 @@ $("tokSave").onclick = async () => {
 };
 $("tokDel").onclick = () => { ls.set("gh_token", null); $("tok").value = ""; $("tokMsg").textContent = "Token bu cihazdan silindi."; load(); };
 function openMonths(){ try { const v = JSON.parse(ls.get("open_months")); return Array.isArray(v) ? v : null; } catch { return null; } }
-function saveMonths(){ ls.set("open_months", JSON.stringify([...document.querySelectorAll("tbody.month:not(.mclosed)")].map(t => t.dataset.m))); }
-function setMonth(tb, isOpen){ tb.classList.toggle("mclosed", !isOpen); const b = tb.querySelector(".mhead button"); b.setAttribute("aria-expanded", isOpen); b.querySelector(".mn").classList.toggle("closed", !isOpen); }
-$("tbl").addEventListener("click", e => {
-  const mh = e.target.closest("tr.mhead");
-  if (mh) { const tb = mh.parentElement; setMonth(tb, tb.classList.contains("mclosed")); saveMonths(); return; }
-  const tr = e.target.closest("tr[data-id]"); if (tr) openForm(rows.find(r => r.id === tr.dataset.id));
+function saveMonths(){ ls.set("open_months", JSON.stringify([...document.querySelectorAll(".month:not(.mclosed)")].map(t => t.dataset.m))); }
+function setMonth(m, isOpen){ m.classList.toggle("mclosed", !isOpen); m.querySelector(".mhead").setAttribute("aria-expanded", isOpen); }
+$("recList").addEventListener("click", e => {
+  const mh = e.target.closest(".mhead");
+  if (mh) { const m = mh.parentElement; setMonth(m, m.classList.contains("mclosed")); saveMonths(); return; }
+  const rb = e.target.closest(".rec[data-id]"); if (rb) openForm(rows.find(r => r.id === rb.dataset.id));
 });
-$("tbl").addEventListener("keydown", e => { if (e.key === "Enter") { const tr = e.target.closest("tr[data-id]"); if (tr) openForm(rows.find(r => r.id === tr.dataset.id)); } });
-$("allOpen").onclick = () => { document.querySelectorAll("tbody.month").forEach(t => setMonth(t, true)); saveMonths(); };
-$("allClose").onclick = () => { document.querySelectorAll("tbody.month").forEach(t => setMonth(t, false)); saveMonths(); };
+$("allOpen").onclick = () => { document.querySelectorAll(".month").forEach(t => setMonth(t, true)); saveMonths(); };
+$("allClose").onclick = () => { document.querySelectorAll(".month").forEach(t => setMonth(t, false)); saveMonths(); };
 function setSection(isOpen){ $("recBody").hidden = !isOpen; $("monthBtns").hidden = !isOpen; $("secTog").classList.toggle("closed", !isOpen); $("secTog").setAttribute("aria-expanded", isOpen); }
 setSection(ls.get("rec_closed") !== "1");
 $("secTog").onclick = () => { const willOpen = $("recBody").hidden; setSection(willOpen); ls.set("rec_closed", willOpen ? null : "1"); };
@@ -449,6 +528,7 @@ $("delBtn").onclick = async () => {
 
 document.addEventListener("visibilitychange", () => { if (!document.hidden && !busy && $("form").hidden) load(); });
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+let rzT; addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(() => { if (rows.length) render(); }, 150); });
 load();
 </script>
 </body>
