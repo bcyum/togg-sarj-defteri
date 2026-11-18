@@ -213,9 +213,9 @@
     {
       "id": "TAA2026003324621",
       "date": "2026-11-17",
-      "start": null,
-      "end": null,
-      "odo": null,
+      "start": 18,
+      "end": 30,
+      "odo": 4218,
       "kwh": 11.47,
       "tl": 137.42,
       "note": "Trugo · TAA2026003324621"
