@@ -113,9 +113,9 @@
     {
       "id": "EZE2026000430739",
       "date": "2026-11-02",
-      "start": 51,
-      "end": 94,
-      "odo": 2520,
+      "start": null,
+      "end": null,
+      "odo": null,
       "kwh": 36.95,
       "tl": 180.67,
       "note": "Zeplin · EZE2026000430739"
