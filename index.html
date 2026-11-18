@@ -102,6 +102,19 @@ h2{font-family:var(--display);font-size:18px;font-weight:700;margin:0}
 .rtl{font-family:var(--mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .rr .rs{font-family:var(--mono);font-size:11.5px;white-space:nowrap}
 .dim{color:var(--muted)}
+.pill.sus{background:transparent;border:1px dashed var(--warn);color:var(--warn)}
+.cons{display:flex;flex-direction:column;gap:2px}
+.cr{display:grid;grid-template-columns:92px minmax(0,1fr) 44px;align-items:center;column-gap:10px;padding:5px 0}
+.cr .cd{font-size:13.5px;font-weight:600;line-height:1.2}
+.cr .cd small{display:block;font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
+.cr .cb{position:relative;height:14px}
+.cr .cb i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:0 4px 4px 0}
+.cr.sus .cb i{background:repeating-linear-gradient(135deg,var(--line) 0 4px,transparent 4px 8px);border:1px dashed var(--warn)}
+.cr .cv{font-family:var(--mono);font-size:13.5px;text-align:right;font-variant-numeric:tabular-nums}
+.cr.sus .cv{color:var(--warn)}
+.cavg{position:absolute;top:-4px;bottom:-4px;border-left:1.5px dashed var(--warn)}
+.cnote{font-size:12px;color:var(--muted);margin:8px 0 0}
+.cnote b{color:var(--warn);font-weight:600}
 .pill{display:inline-block;padding:0 7px;border-radius:999px;font-size:11.5px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 form,.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:640px){form{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -197,7 +210,7 @@ footer p{margin:0 0 6px;max-width:70ch}
   </section>
 
   <section>
-    <div class="sechead"><h2>Tüketim (kWh / 100 km)</h2><p class="hint">Yüzde ve km'si girilmiş ardışık şarjlar arası</p></div>
+    <div class="sechead"><h2>Tüketim (kWh / 100 km)</h2><p class="hint">İki şarj arası yol; yüzde ve km'si girilmiş ardışık şarjlar</p></div>
     <div class="chart" id="chart"><div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div></div>
   </section>
 
@@ -303,6 +316,8 @@ function compute(list){
       o.used = (p.end - r.start) / 100 * CAP;
       if (o.dist > 0 && o.used > 0) {
         o.cons = o.used / o.dist * 100;
+        // Gerçekçi olmayan değerleri işaretle: 35 üstü / 10 altı ya da bu şarjın verimi %100'ü aşıyorsa (yüzde hatalı girilmiş)
+        o.sus = o.cons > 35 || o.cons < 10 || (o.eff != null && o.eff > 1.0) || (p.kwh > 0 && (p.end - p.start) / 100 * CAP / p.kwh > 1.0);
         const pAdded = (p.end - p.start) / 100 * CAP;
         if (pAdded > 0) o.cost = o.used * (p.tl / pAdded) / o.dist * 100;
       }
@@ -357,7 +372,7 @@ function recHtml(r){
   const bits = [esc(prov(r) === "Diğer" ? (r.note || "Not yok") : prov(r))];
   if (has(r.start) && has(r.end)) bits.push(`%${r.start}→%${r.end}`);
   if (has(r.odo)) bits.push(`${r.odo.toLocaleString("tr-TR")} km`);
-  if (r.cons != null) bits.push(`<span class="pill">${nf(r.cons,1)} kWh/100 km</span>`);
+  if (r.cons != null) bits.push(`<span class="pill${r.sus ? " sus" : ""}">${nf(r.cons,1)} kWh/100 km${r.sus ? " ?" : ""}</span>`);
   return `<button type="button" class="rec" data-id="${esc(r.id)}">
     <span class="rl"><span class="rd">${dayLabel(r.date)}</span><span class="rs">${bits.join(" · ")}</span></span>
     <span class="rr"><span class="rtl">${nf(r.tl,2)} ₺</span><span class="rs">${nf(r.kwh,2)} kWh · ${r.unit != null ? nf(r.unit,2) : "—"} ₺/kWh</span></span>
@@ -425,26 +440,18 @@ function drawCumulative(c){
 
 function drawChart(iv){
   const box = $("chart");
-  if (!iv.length) { box.innerHTML = `<div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div>`; return; }
-  const W = Math.max(300, box.clientWidth - 30), H = 220, L = 34, R = 10, T = 22, B = 40;
-  const max = Math.max(...iv.map(r=>r.cons));
-  const top = Math.ceil(max/5)*5 || 5;
-  const step = top <= 40 ? 5 : 10;
-  const y = v => T + (H-T-B) * (1 - v/top);
-  const slot = (W-L-R) / iv.length, bw = Math.min(56, slot*0.6);
-  const avg = iv.reduce((a,r)=>a+r.used,0) / iv.reduce((a,r)=>a+r.dist,0) * 100;
-  let g = "";
-  for (let v=0; v<=top; v+=step) g += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
-  const bars = iv.map((r,i) => {
-    const cx = L + slot*i + slot/2, yy = y(r.cons);
-    return `<rect x="${cx-bw/2}" y="${yy}" width="${bw}" height="${y(0)-yy}" rx="3" fill="var(--bar)"/>
-      <text class="val" x="${cx}" y="${yy-6}" text-anchor="middle">${nf(r.cons,1)}</text>
-      <text x="${cx}" y="${H-B+16}" text-anchor="middle">${fmtDate(r.date).slice(0,5)}</text>
-      <text x="${cx}" y="${H-B+30}" text-anchor="middle">${r.dist} km</text>`;
-  }).join("");
-  const ay = y(avg);
-  const avgLine = `<line x1="${L}" x2="${W-R}" y1="${ay}" y2="${ay}" stroke="var(--warn)" stroke-dasharray="4 4" stroke-width="1.5"/><text x="${W-R}" y="${ay-5}" text-anchor="end" style="fill:var(--warn)">ort. ${nf(avg,1)}</text>`;
-  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Şarjlar arası tüketim grafiği">${g}${bars}${avgLine}</svg>`;
+  if (!iv.length) { box.innerHTML = `<div class="empty">Tüketim için yüzde ve km'si girilmiş ardışık iki şarj gerekiyor.</div>`; return; }
+  const ok = iv.filter(r => !r.sus);
+  const avg = ok.length ? ok.reduce((a,r)=>a+r.used,0) / ok.reduce((a,r)=>a+r.dist,0) * 100 : null;
+  const max = Math.max(...iv.map(r => r.cons), avg || 0) * 1.05;
+  const nSus = iv.length - ok.length;
+  box.innerHTML = `<div class="cons">${iv.map(r => `
+    <div class="cr${r.sus ? " sus" : ""}" title="${fmtDate(r.date)} şarjına kadar ${r.dist} km, ${nf(r.used,1)} kWh${r.sus ? " — şüpheli, ortalamaya katılmadı" : ""}">
+      <span class="cd">${fmtDate(r.date).slice(0,5)}<small>${r.dist.toLocaleString("tr-TR")} km</small></span>
+      <span class="cb"><i style="width:${Math.min(r.cons, max)/max*100}%"></i>${avg ? `<span class="cavg" style="left:${avg/max*100}%"></span>` : ""}</span>
+      <span class="cv">${nf(r.cons,1)}${r.sus ? "?" : ""}</span>
+    </div>`).join("")}</div>
+    <p class="cnote">${avg ? `Kesikli çizgi ortalama: <b style="color:var(--warn)">${nf(avg,1)} kWh/100 km</b> (${ok.reduce((a,r)=>a+r.dist,0).toLocaleString("tr-TR")} km).` : ""}${nSus ? ` Taralı ${nSus} değer gerçekçi değil (yüzde ya da km hatalı girilmiş olabilir), ortalamaya katılmadı.` : ""}</p>`;
 }
 
 function openForm(r){
