@@ -181,6 +181,16 @@
       "note": "Trugo · TAA2026003278032"
     },
     {
+      "id": "2026-11-14-3ezj",
+      "date": "2026-11-14",
+      "start": null,
+      "end": null,
+      "odo": 3583,
+      "kwh": 34.8,
+      "tl": 379.35,
+      "note": "D-Charge"
+    },
+    {
       "id": "TAA2026003319600",
       "date": "2026-11-16",
       "start": null,
