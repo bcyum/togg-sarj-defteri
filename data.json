@@ -19,6 +19,8 @@
     {"id": "EZE2026000452171", "date": "2026-11-12", "start": 68, "end": 100, "odo": 2959, "kwh": 32.04, "tl": 156.7, "note": "Zeplin · EZE2026000452171"},
     {"id": "TAA2026003278032", "date": "2026-11-14", "start": 16, "end": 84, "odo": 3284, "kwh": 67.769, "tl": 811.93, "note": "Trugo · TAA2026003278032"},
     {"id": "2026-11-14-3ezj", "date": "2026-11-14", "start": 24, "end": 58, "odo": 3583, "kwh": 34.8, "tl": 379.35, "note": "D-Charge"},
+    {"id": "COP31-2026-11-15", "date": "2026-11-15", "start": 42, "end": 95, "odo": null, "kwh": 54.83, "tl": 0, "note": "Ücretsiz · COP31 Otopark Aksu (2 işlem)"},
+    {"id": "COP31-2026-11-16", "date": "2026-11-16", "start": 77, "end": 100, "odo": null, "kwh": 23.88, "tl": 0, "note": "Ücretsiz · COP31 Otopark Aksu"},
     {"id": "TAA2026003320217", "date": "2026-11-16", "start": null, "end": null, "odo": null, "kwh": 42.447, "tl": 508.55, "note": "Trugo · 5 işlem (TAA2026003319600, 319717, 319724, 319800, 320217)"},
     {"id": "TAA2026003321759", "date": "2026-11-17", "start": null, "end": null, "odo": null, "kwh": 14.204, "tl": 170.18, "note": "Trugo · TAA2026003321759"},
     {"id": "TAA2026003324621", "date": "2026-11-17", "start": null, "end": null, "odo": null, "kwh": 11.47, "tl": 137.42, "note": "Trugo · TAA2026003324621"},
