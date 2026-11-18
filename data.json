@@ -14,7 +14,7 @@
     {"id": "EZE2026000429021", "date": "2026-11-01", "start": 45, "end": 70, "odo": 2478, "kwh": 23.5, "tl": 200.22, "note": "Zeplin · EZE2026000429021"},
     {"id": "EZE2026000430739", "date": "2026-11-02", "start": 51, "end": 94, "odo": 2520, "kwh": 36.95, "tl": 180.67, "note": "Zeplin · EZE2026000430739"},
     {"id": "TAA2026003206604", "date": "2026-11-08", "start": null, "end": null, "odo": null, "kwh": 23.587, "tl": 282.59, "note": "Trugo · TAA2026003206604"},
-    {"id": "Z1307075", "date": "2026-11-10", "start": 32, "end": 72, "odo": 2837, "kwh": 41.9, "tl": 204.96, "note": "Zeplin · İşlem 1307075"},
+    {"id": "Z1307075", "date": "2026-11-10", "start": 31, "end": 72, "odo": 2837, "kwh": 41.9, "tl": 204.96, "note": "Zeplin · İşlem 1307075"},
     {"id": "EZE2026000451746", "date": "2026-11-12", "start": null, "end": null, "odo": null, "kwh": 29.98, "tl": 146.6, "note": "Zeplin · EZE2026000451746"},
     {"id": "EZE2026000452171", "date": "2026-11-12", "start": null, "end": null, "odo": null, "kwh": 32.04, "tl": 156.7, "note": "Zeplin · EZE2026000452171"},
     {"id": "TAA2026003278032", "date": "2026-11-14", "start": null, "end": null, "odo": null, "kwh": 67.769, "tl": 811.93, "note": "Trugo · TAA2026003278032"},
