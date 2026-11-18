@@ -279,7 +279,7 @@ function render(){
   } else {
     const consVals = c.filter(r => r.cons != null).map(r => r.cons);
     const avgC = consVals.length ? consVals.reduce((a,b)=>a+b,0)/consVals.length : null;
-    tb.innerHTML = c.slice().reverse().map(r => `
+    tb.innerHTML = c.map(r => `
       <tr data-id="${esc(r.id)}" tabindex="0">
         <td class="date">${fmtDate(r.date)}${r.time ? ` <span class="dim" style="font-weight:400;font-size:12px">${esc(r.time)}</span>` : ""}${r.note ? `<div class="dim" style="font-weight:400;font-size:12px">${esc(r.note)}</div>` : ""}</td>
         <td>${has(r.start) && has(r.end) ? `<span class="soc"><span class="socbar"><i style="left:${r.start}%;width:${Math.max(0,r.end-r.start)}%"></i></span>%${r.start} → %${r.end}</span>` : '<span class="dim">% girilmedi</span>'}</td>
