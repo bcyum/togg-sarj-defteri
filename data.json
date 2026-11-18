@@ -26,9 +26,9 @@
       "id": "MYA2026000027926",
       "date": "2026-09-27",
       "time": "14:24",
-      "start": null,
-      "end": null,
-      "odo": null,
+      "start": 20,
+      "end": 86,
+      "odo": 365,
       "kwh": 70.001,
       "tl": 909.73,
       "note": "MyCharge · MYA2026000027926"
