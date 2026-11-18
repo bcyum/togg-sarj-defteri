@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Togg Şarj Defteri</title>
+<meta name="theme-color" content="#0f7d72">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Togg Şarj">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Düzen: tek kolon araç defteri — özet şeridi, tüketim grafiği, şarj kayıtları tablosu, ekleme formu */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --fg:#14202a; --muted:#5d6b76; --line:#d9e0e4;
+  --accent:#0f7d72; --accent-soft:#d7efec; --warn:#b4610a; --danger:#b3261e; --bar:#0f7d72;
+  --display:"Archivo",system-ui,sans-serif; --body:"Archivo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0e1519; --surface:#152027; --fg:#e6edf0; --muted:#93a3ad; --line:#26343c;
+  --accent:#3cc2b2; --accent-soft:#163a37; --warn:#e2a050; --danger:#f08a80; --bar:#3cc2b2; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none!important}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+.hbtns{display:flex;gap:8px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,36px);letter-spacing:-.02em;margin:0;line-height:1.1;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+.sub b{font-family:var(--mono);font-weight:500;color:var(--fg)}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:9px 14px;font-weight:600}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+button.danger{color:var(--danger);border-color:var(--danger)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.banner{background:var(--accent-soft);border-radius:10px;padding:12px 14px;font-size:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.banner.err{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--fg);border-bottom:1px solid var(--line)}
+.stat{padding:14px 14px 14px 0;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat+.stat{padding-left:14px;border-left:1px solid var(--line)}
+.stat .v{font-family:var(--mono);font-size:clamp(20px,3.6vw,28px);font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat .v small{font-size:13px;color:var(--muted);margin-left:3px}
+.stat .n{font-size:12px;color:var(--muted)}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){padding-left:0;border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+section{display:flex;flex-direction:column;gap:12px}
+h2{font-family:var(--display);font-size:18px;font-weight:700;margin:0}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:13px;margin:0}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:300px;height:auto}
+.chart text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.chart .val{fill:var(--fg);font-weight:500}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:820px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--mono);font-size:13.5px}
+td.date{font-family:var(--body);font-weight:600;font-size:14px}
+tbody tr[data-id]{cursor:pointer}
+tbody tr[data-id]:hover td{background:var(--accent-soft)}
+tbody tr:last-child td{border-bottom:0}
+.soc{display:inline-flex;align-items:center;gap:8px}
+.socbar{position:relative;width:56px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.socbar i{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.dim{color:var(--muted)}
+.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:12px;background:var(--accent-soft);color:var(--accent)}
+.pill.hi{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+form,.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.panel{grid-template-columns:1fr}
+.panel p{margin:0;font-size:14px;max-width:70ch}
+.panel ol{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.panel a{color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field.wide{grid-column:1/-1}
+input{font:inherit;font-family:var(--mono);font-size:16px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%;min-width:0}
+.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.actions .sp{flex:1}
+.msg{font-size:13px;color:var(--muted)}
+.msg.err{color:var(--danger)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:12.5px;line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+footer p{margin:0 0 6px;max-width:70ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Togg Şarj Defteri</h1>
+      <p class="sub">T10F · LFP batarya <b>89,5 kWh</b> · hesaplar odometre ve şarj yüzdesine göre</p>
+    </div>
+    <div class="hbtns">
+      <button type="button" id="setBtn" aria-label="Ayarlar">Ayarlar</button>
+      <button class="primary" id="addBtn" type="button">+ Şarj ekle</button>
+    </div>
+  </header>
+
+  <div class="banner" id="banner" hidden><span id="bannerText"></span><button type="button" id="bannerBtn" hidden>Token gir</button></div>
+
+  <div class="panel" id="settings" hidden>
+    <h2>GitHub bağlantısı</h2>
+    <p>Kayıtlar <b>bcyum/togg-sarj-defteri</b> reposundaki <b>data.json</b> dosyasında tutulur. Kayıt eklemek için bu cihaza bir kez GitHub token'ı girmen gerekir. Token sadece bu cihazın tarayıcısında saklanır.</p>
+    <ol>
+      <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> sayfasını aç.</li>
+      <li>Ad ver (ör. togg-sarj), süreyi istediğin kadar uzun seç.</li>
+      <li>Repository access: <b>Only select repositories</b> → <b>togg-sarj-defteri</b>.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>.</li>
+      <li>Generate token de, çıkan kodu aşağıya yapıştır.</li>
+    </ol>
+    <div class="field"><label class="label" for="tok">Token</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_…"></div>
+    <div class="actions">
+      <button class="primary" type="button" id="tokSave">Kaydet ve dene</button>
+      <button type="button" id="tokClose">Kapat</button>
+      <span class="sp"></span>
+      <button type="button" class="danger" id="tokDel">Token'ı sil</button>
+      <span class="msg" id="tokMsg"></span>
+    </div>
+  </div>
+
+  <form id="form" hidden>
+    <div class="field"><label class="label" for="f-date">Tarih</label><input id="f-date" type="date" required></div>
+    <div class="field"><label class="label" for="f-start">Başlangıç %</label><input id="f-start" type="number" min="0" max="100" step="1" inputmode="numeric" required></div>
+    <div class="field"><label class="label" for="f-end">Bitiş %</label><input id="f-end" type="number" min="0" max="100" step="1" inputmode="numeric" required></div>
+    <div class="field"><label class="label" for="f-odo">Kilometre</label><input id="f-odo" type="number" min="0" step="1" inputmode="numeric" required></div>
+    <div class="field"><label class="label" for="f-kwh">Şarj edilen kWh</label><input id="f-kwh" type="text" inputmode="decimal" placeholder="72,28" required></div>
+    <div class="field"><label class="label" for="f-tl">Tutar (TL)</label><input id="f-tl" type="text" inputmode="decimal" placeholder="362,85" required></div>
+    <div class="field wide"><label class="label" for="f-note">Not (istasyon vb., isteğe bağlı)</label><input id="f-note" type="text" style="font-family:var(--body)"></div>
+    <div class="actions">
+      <button class="primary" type="submit" id="saveBtn">Kaydet</button>
+      <button type="button" id="cancelBtn">Vazgeç</button>
+      <span class="sp"></span>
+      <button type="button" class="danger" id="delBtn" hidden>Sil</button>
+      <span class="msg" id="formMsg"></span>
+    </div>
+  </form>
+
+  <div class="stats" id="stats">
+    <div class="stat"><span class="label">Ort. tüketim</span><span class="v" id="s-cons">—</span><span class="n">şarjlar arası, batarya</span></div>
+    <div class="stat"><span class="label">100 km maliyeti</span><span class="v" id="s-cost">—</span><span class="n">tahmini</span></div>
+    <div class="stat"><span class="label">Ort. birim fiyat</span><span class="v" id="s-price">—</span><span class="n">toplam TL ÷ toplam kWh</span></div>
+    <div class="stat"><span class="label">Toplam</span><span class="v" id="s-tot">—</span><span class="n" id="s-totn">—</span></div>
+  </div>
+
+  <section>
+    <div class="sechead"><h2>Tüketim (kWh / 100 km)</h2><p class="hint">Her çubuk iki şarj arasındaki yolu gösterir</p></div>
+    <div class="chart" id="chart"><div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div></div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Şarj kayıtları</h2><p class="hint">Düzenlemek için satıra dokun</p></div>
+    <div class="tablebox">
+      <table>
+        <thead><tr>
+          <th>Tarih</th><th>Şarj</th><th>Km</th><th>Yol</th><th>kWh</th><th>Tutar</th><th>TL/kWh</th><th>Verim</th><th>kWh/100 km</th><th>TL/100 km</th>
+        </tr></thead>
+        <tbody id="rows"><tr><td colspan="10" class="empty">Kayıtlar yükleniyor…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Nasıl hesaplanıyor:</b> Yol, bu şarjdaki km ile bir önceki şarjdaki km farkıdır. Bu yolda harcanan enerji, önceki şarjın bitiş yüzdesi ile bu şarjın başlangıç yüzdesi arasındaki fark × 89,5 kWh olarak alınır.</p>
+    <p>Verim, bataryaya giren enerjinin (eklenen % × 89,5) istasyonda ödenen kWh'e oranıdır; şarj kaybını gösterir. TL/100 km, harcanan enerjiyi o yolu yapan önceki şarjın bataryaya giren kWh başına maliyetiyle çarpar.</p>
+  </footer>
+</div>
+
+<script>
+const CAP = 89.5;
+const REPO = "bcyum/togg-sarj-defteri";
+const FILE = "data.json";
+const API = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+let rows = [], sha = null, editingId = null, delArmed = false, busy = false;
+const $ = id => document.getElementById(id);
+const nf = (n, d=1) => n.toLocaleString("tr-TR", {minimumFractionDigits:d, maximumFractionDigits:d});
+const parseNum = s => { s = String(s).trim().replace(/\s/g,""); if (s.includes(",")) s = s.replace(/\./g,"").replace(",","."); return parseFloat(s); };
+const fmtDate = iso => { const [y,m,d] = iso.split("-"); return `${d}.${m}.${y}`; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k,v); } catch {} } };
+const token = () => ls.get("gh_token");
+
+// UTF-8 güvenli base64
+const b64enc = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => bin += String.fromCharCode(x)); return btoa(bin); };
+const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")), c => c.charCodeAt(0)));
+
+async function gh(method, body){
+  const r = await fetch(API + (method === "GET" ? `?t=${Date.now()}` : ""), {
+    method, cache: "no-store",
+    headers: { "Accept":"application/vnd.github+json", "Authorization":`Bearer ${token()}`, "X-GitHub-Api-Version":"2022-11-28", ...(body ? {"Content-Type":"application/json"} : {}) },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) { const e = new Error(r.status === 401 ? "Token geçersiz ya da süresi dolmuş." : r.status === 403 || r.status === 404 ? "Token'ın bu repoya yazma izni yok (Contents: Read and write)." : r.status === 409 ? "Kayıtlar başka bir cihazda değişmiş; liste yenilendi, tekrar dene." : `GitHub hatası (${r.status}).`); e.status = r.status; throw e; }
+  return r.json();
+}
+
+async function load(){
+  const cached = ls.get("cache");
+  if (cached && !rows.length) { try { rows = JSON.parse(cached); render(); } catch {} }
+  try {
+    if (token()) {
+      const j = await gh("GET");
+      sha = j.sha; rows = JSON.parse(b64dec(j.content)).sarjlar || [];
+      showBanner("");
+    } else {
+      const r = await fetch(`${FILE}?t=${Date.now()}`, {cache:"no-store"});
+      if (!r.ok) throw new Error("data.json okunamadı.");
+      rows = (await r.json()).sarjlar || [];
+      showBanner("Kayıt eklemek için bu cihaza bir kez GitHub token'ı gir.", false, true);
+    }
+    ls.set("cache", JSON.stringify(rows));
+    render();
+  } catch (e) {
+    if (rows.length) { render(); showBanner(`Güncel liste alınamadı, son kaydedilen gösteriliyor. ${e.message}`, true, e.status === 401); }
+    else { $("rows").innerHTML = `<tr><td colspan="10" class="empty">${esc(e.message)}</td></tr>`; showBanner(e.message, true, e.status === 401); }
+  }
+}
+
+async function commit(newRows, message){
+  if (!token()) throw new Error("Önce Ayarlar'dan GitHub token'ı gir.");
+  const sorted = [...newRows].sort((a,b) => a.odo - b.odo);
+  const content = JSON.stringify({sarjlar: sorted}, null, 2) + "\n";
+  try {
+    const j = await gh("PUT", {message, content: b64enc(content), sha});
+    sha = j.content.sha; rows = sorted; ls.set("cache", JSON.stringify(rows)); render();
+  } catch (e) {
+    if (e.status === 409 || e.status === 422) await load();
+    throw e;
+  }
+}
+
+function showBanner(text, err, tokenBtn){
+  $("banner").hidden = !text; $("bannerText").textContent = text || "";
+  $("banner").className = "banner" + (err ? " err" : "");
+  $("bannerBtn").hidden = !tokenBtn;
+}
+
+function compute(list){
+  const s = [...list].sort((a,b) => a.odo - b.odo || a.date.localeCompare(b.date));
+  return s.map((r,i) => {
+    const added = (r.end - r.start) / 100 * CAP;
+    const o = {...r, added, eff: r.kwh > 0 ? added / r.kwh : null, unit: r.kwh > 0 ? r.tl / r.kwh : null};
+    if (i > 0) {
+      const p = s[i-1];
+      o.dist = r.odo - p.odo;
+      o.used = (p.end - r.start) / 100 * CAP;
+      if (o.dist > 0 && o.used > 0) {
+        o.cons = o.used / o.dist * 100;
+        const pAdded = (p.end - p.start) / 100 * CAP;
+        if (pAdded > 0) o.cost = o.used * (p.tl / pAdded) / o.dist * 100;
+      }
+    }
+    return o;
+  });
+}
+
+function render(){
+  const c = compute(rows);
+  const tb = $("rows");
+  if (!c.length) {
+    tb.innerHTML = `<tr><td colspan="10" class="empty">Henüz kayıt yok. İlk şarjı “+ Şarj ekle” ile gir.</td></tr>`;
+  } else {
+    const consVals = c.filter(r => r.cons != null).map(r => r.cons);
+    const avgC = consVals.length ? consVals.reduce((a,b)=>a+b,0)/consVals.length : null;
+    tb.innerHTML = c.slice().reverse().map(r => `
+      <tr data-id="${esc(r.id)}" tabindex="0">
+        <td class="date">${fmtDate(r.date)}${r.note ? `<div class="dim" style="font-weight:400;font-size:12px">${esc(r.note)}</div>` : ""}</td>
+        <td><span class="soc"><span class="socbar"><i style="left:${r.start}%;width:${Math.max(0,r.end-r.start)}%"></i></span>%${r.start} → %${r.end}</span></td>
+        <td>${r.odo.toLocaleString("tr-TR")}</td>
+        <td>${r.dist != null ? r.dist.toLocaleString("tr-TR") + " km" : '<span class="dim">—</span>'}</td>
+        <td>${nf(r.kwh,2)}</td>
+        <td>${nf(r.tl,2)} ₺</td>
+        <td>${r.unit != null ? nf(r.unit,2) : "—"}</td>
+        <td>${r.eff != null ? "%" + nf(r.eff*100,0) : "—"}</td>
+        <td>${r.cons != null ? `<span class="pill${avgC && r.cons > avgC*1.1 ? " hi" : ""}">${nf(r.cons,1)}</span>` : '<span class="dim">—</span>'}</td>
+        <td>${r.cost != null ? nf(r.cost,0) + " ₺" : '<span class="dim">—</span>'}</td>
+      </tr>`).join("");
+  }
+
+  const iv = c.filter(r => r.cons != null);
+  const dist = iv.reduce((a,r)=>a+r.dist,0), used = iv.reduce((a,r)=>a+r.used,0);
+  const costIv = iv.filter(r => r.cost != null);
+  const costSum = costIv.reduce((a,r)=>a + r.cost*r.dist/100,0), costDist = costIv.reduce((a,r)=>a+r.dist,0);
+  const tKwh = c.reduce((a,r)=>a+r.kwh,0), tTl = c.reduce((a,r)=>a+r.tl,0);
+  $("s-cons").innerHTML = dist ? `${nf(used/dist*100,1)}<small>kWh</small>` : "—";
+  $("s-cost").innerHTML = costDist ? `${nf(costSum/costDist*100,0)}<small>₺</small>` : "—";
+  $("s-price").innerHTML = tKwh ? `${nf(tTl/tKwh,2)}<small>₺/kWh</small>` : "—";
+  $("s-tot").innerHTML = c.length ? `${nf(tTl,0)}<small>₺</small>` : "—";
+  $("s-totn").textContent = c.length ? `${c.length} şarj · ${nf(tKwh,1)} kWh · ${(c.at(-1).odo - c[0].odo).toLocaleString("tr-TR")} km` : "—";
+  drawChart(iv);
+}
+
+function drawChart(iv){
+  const box = $("chart");
+  if (!iv.length) { box.innerHTML = `<div class="empty">Tüketim için en az iki şarj kaydı gerekiyor.</div>`; return; }
+  const W = 640, H = 220, L = 34, R = 10, T = 22, B = 40;
+  const max = Math.max(...iv.map(r=>r.cons));
+  const top = Math.ceil(max/5)*5 || 5;
+  const step = top <= 40 ? 5 : 10;
+  const y = v => T + (H-T-B) * (1 - v/top);
+  const slot = (W-L-R) / iv.length, bw = Math.min(56, slot*0.6);
+  const avg = iv.reduce((a,r)=>a+r.used,0) / iv.reduce((a,r)=>a+r.dist,0) * 100;
+  let g = "";
+  for (let v=0; v<=top; v+=step) g += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+  const bars = iv.map((r,i) => {
+    const cx = L + slot*i + slot/2, yy = y(r.cons);
+    return `<rect x="${cx-bw/2}" y="${yy}" width="${bw}" height="${y(0)-yy}" rx="3" fill="var(--bar)"/>
+      <text class="val" x="${cx}" y="${yy-6}" text-anchor="middle">${nf(r.cons,1)}</text>
+      <text x="${cx}" y="${H-B+16}" text-anchor="middle">${fmtDate(r.date).slice(0,5)}</text>
+      <text x="${cx}" y="${H-B+30}" text-anchor="middle">${r.dist} km</text>`;
+  }).join("");
+  const ay = y(avg);
+  const avgLine = `<line x1="${L}" x2="${W-R}" y1="${ay}" y2="${ay}" stroke="var(--warn)" stroke-dasharray="4 4" stroke-width="1.5"/><text x="${W-R}" y="${ay-5}" text-anchor="end" style="fill:var(--warn)">ort. ${nf(avg,1)}</text>`;
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Şarjlar arası tüketim grafiği">${g}${bars}${avgLine}</svg>`;
+}
+
+function openForm(r){
+  if (!token()) { openSettings(); return; }
+  editingId = r ? r.id : null; delArmed = false;
+  $("form").hidden = false;
+  $("f-date").value = r ? r.date : new Date().toISOString().slice(0,10);
+  $("f-start").value = r ? r.start : "";
+  $("f-end").value = r ? r.end : "";
+  $("f-odo").value = r ? r.odo : "";
+  $("f-kwh").value = r ? String(r.kwh).replace(".",",") : "";
+  $("f-tl").value = r ? String(r.tl).replace(".",",") : "";
+  $("f-note").value = r ? (r.note || "") : "";
+  $("delBtn").hidden = !r; $("delBtn").textContent = "Sil";
+  $("saveBtn").textContent = r ? "Güncelle" : "Kaydet";
+  setMsg("");
+  $("form").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+}
+function closeForm(){ $("form").hidden = true; editingId = null; }
+function setMsg(t, err){ const m = $("formMsg"); m.textContent = t; m.className = "msg" + (err ? " err" : ""); }
+function openSettings(){ $("settings").hidden = false; $("tok").value = token() || ""; $("tokMsg").textContent = ""; $("settings").scrollIntoView({block:"start"}); }
+
+$("addBtn").onclick = () => openForm(null);
+$("setBtn").onclick = () => $("settings").hidden ? openSettings() : ($("settings").hidden = true);
+$("bannerBtn").onclick = openSettings;
+$("tokClose").onclick = () => $("settings").hidden = true;
+$("cancelBtn").onclick = closeForm;
+$("tokSave").onclick = async () => {
+  const v = $("tok").value.trim(); if (!v) { $("tokMsg").textContent = "Token boş."; return; }
+  ls.set("gh_token", v); $("tokMsg").textContent = "Deneniyor…";
+  try { const j = await gh("GET"); sha = j.sha; $("tokMsg").textContent = "Bağlandı."; await load(); setTimeout(() => $("settings").hidden = true, 800); }
+  catch (e) { $("tokMsg").textContent = e.message; }
+};
+$("tokDel").onclick = () => { ls.set("gh_token", null); $("tok").value = ""; $("tokMsg").textContent = "Token bu cihazdan silindi."; load(); };
+$("rows").addEventListener("click", e => { const tr = e.target.closest("tr[data-id]"); if (tr) openForm(rows.find(r => r.id === tr.dataset.id)); });
+$("rows").addEventListener("keydown", e => { if (e.key === "Enter") { const tr = e.target.closest("tr[data-id]"); if (tr) openForm(rows.find(r => r.id === tr.dataset.id)); } });
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault(); if (busy) return;
+  const d = {
+    date: $("f-date").value,
+    start: parseNum($("f-start").value), end: parseNum($("f-end").value),
+    odo: parseNum($("f-odo").value), kwh: parseNum($("f-kwh").value), tl: parseNum($("f-tl").value),
+    note: $("f-note").value.trim()
+  };
+  if ([d.start,d.end,d.odo,d.kwh,d.tl].some(v => !isFinite(v)) || !d.date) { setMsg("Tüm sayısal alanları doldur.", true); return; }
+  if (d.end <= d.start) { setMsg("Bitiş yüzdesi başlangıçtan büyük olmalı.", true); return; }
+  busy = true; $("saveBtn").disabled = true; setMsg("GitHub'a kaydediliyor…");
+  try {
+    if (editingId) await commit(rows.map(r => r.id === editingId ? {id: editingId, ...d} : r), `Şarj güncellendi: ${d.date}`);
+    else await commit([...rows, {id: d.date + "-" + Math.random().toString(36).slice(2,6), ...d}], `Şarj eklendi: ${d.date}`);
+    closeForm();
+  } catch (err) { setMsg(err.message, true); }
+  busy = false; $("saveBtn").disabled = false;
+});
+
+$("delBtn").onclick = async () => {
+  if (!delArmed) { delArmed = true; $("delBtn").textContent = "Silmeyi onayla"; return; }
+  if (busy) return; busy = true; setMsg("Siliniyor…");
+  try { const r = rows.find(x => x.id === editingId); await commit(rows.filter(x => x.id !== editingId), `Şarj silindi: ${r ? r.date : editingId}`); closeForm(); }
+  catch (err) { setMsg(err.message, true); }
+  busy = false;
+};
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !busy && $("form").hidden) load(); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+load();
+</script>
+</body>
+</html>
