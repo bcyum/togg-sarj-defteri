@@ -158,8 +158,7 @@ footer p{margin:0 0 6px;max-width:70ch}
 
   <form id="form" hidden>
     <div class="field"><label class="label" for="f-date">Tarih</label><input id="f-date" type="date" required></div>
-    <div class="field"><label class="label" for="f-time">Saat</label><input id="f-time" type="time"></div>
-    <div class="field"><label class="label" for="f-start">Başlangıç %</label><input id="f-start" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
+        <div class="field"><label class="label" for="f-start">Başlangıç %</label><input id="f-start" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
     <div class="field"><label class="label" for="f-end">Bitiş %</label><input id="f-end" type="number" min="0" max="100" step="1" inputmode="numeric"></div>
     <div class="field"><label class="label" for="f-odo">Kilometre</label><input id="f-odo" type="number" min="0" step="1" inputmode="numeric"></div>
     <div class="field"><label class="label" for="f-kwh">Şarj edilen kWh</label><input id="f-kwh" type="text" inputmode="decimal" placeholder="72,28" required></div>
@@ -236,7 +235,7 @@ const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null
 const token = () => ls.get("gh_token");
 const has = v => v !== null && v !== undefined && v !== "" && isFinite(v);
 const full = r => has(r.start) && has(r.end) && has(r.odo);
-const chrono = (a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||"") || ((has(a.odo)?a.odo:0) - (has(b.odo)?b.odo:0));
+const chrono = (a,b) => a.date.localeCompare(b.date);
 
 // UTF-8 güvenli base64
 const b64enc = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(x => bin += String.fromCharCode(x)); return btoa(bin); };
@@ -360,7 +359,7 @@ function recHtml(r){
   if (has(r.odo)) bits.push(`${r.odo.toLocaleString("tr-TR")} km`);
   if (r.cons != null) bits.push(`<span class="pill">${nf(r.cons,1)} kWh/100 km</span>`);
   return `<button type="button" class="rec" data-id="${esc(r.id)}">
-    <span class="rl"><span class="rd">${dayLabel(r.date)}${r.time ? ` <span class="wd">${esc(r.time)}</span>` : ""}</span><span class="rs">${bits.join(" · ")}</span></span>
+    <span class="rl"><span class="rd">${dayLabel(r.date)}</span><span class="rs">${bits.join(" · ")}</span></span>
     <span class="rr"><span class="rtl">${nf(r.tl,2)} ₺</span><span class="rs">${nf(r.kwh,2)} kWh · ${r.unit != null ? nf(r.unit,2) : "—"} ₺/kWh</span></span>
   </button>`;
 }
@@ -406,7 +405,7 @@ function drawCumulative(c){
   const box = $("chartCum");
   if (c.length < 2) { box.innerHTML = `<div class="empty">En az iki şarj gerekiyor.</div>`; return; }
   const day = iso => { const [y,m,d] = iso.split("-").map(Number); return Date.UTC(y,m-1,d)/864e5; };
-  const pts = c.filter(r => r.kwh > 0).map(r => ({x: day(r.date) + (r.time ? (+r.time.slice(0,2)*60 + +r.time.slice(3,5))/1440 : 0.5), v: r.tl/r.kwh, r}));
+  const pts = c.filter(r => r.kwh > 0).map(r => ({x: day(r.date) + 0.5, v: r.tl/r.kwh, r}));
   const W = Math.max(300, box.clientWidth - 30), H = 240, Lm = 40, R = 14, T = 16, B = 30;
   const x0 = Math.min(...pts.map(p=>p.x)) - 1, x1 = Math.max(...pts.map(p=>p.x)) + 1;
   const max = Math.max(...pts.map(p => p.v)), top = Math.ceil(max/2)*2 + (max % 2 > 1.6 ? 2 : 0), step = top > 12 ? 4 : 2;
@@ -417,7 +416,7 @@ function drawCumulative(c){
   while (d.getTime()/864e5 <= x1) { const xv = X(d.getTime()/864e5); g += `<line x1="${xv}" x2="${xv}" y1="${T}" y2="${H-B}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="${xv}" y="${H-B+18}" text-anchor="middle">${d.toLocaleDateString("tr-TR",{month:"short", timeZone:"UTC"})}</text>`; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+1, 1)); }
   const tK = pts.reduce((a,p)=>a+p.r.kwh,0), avg = pts.reduce((a,p)=>a+p.r.tl,0) / tK, kMax = Math.max(...pts.map(p=>p.r.kwh));
   const dots = pts.map(p => { const rr = 3 + 6*Math.sqrt(p.r.kwh/kMax);
-    return `<g class="hov"><title>${fmtDate(p.r.date)}${p.r.time ? " " + p.r.time : ""} · ${esc(prov(p.r))}: ${nf(p.v,2)} ₺/kWh · ${nf(p.r.kwh,2)} kWh · ${nf(p.r.tl,2)} ₺</title><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${Math.max(rr,10)}" fill="transparent"/><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${rr}" fill="var(--bar)" fill-opacity=".75" stroke="var(--surface)" stroke-width="2"/></g>`; }).join("");
+    return `<g class="hov"><title>${fmtDate(p.r.date)} · ${esc(prov(p.r))}: ${nf(p.v,2)} ₺/kWh · ${nf(p.r.kwh,2)} kWh · ${nf(p.r.tl,2)} ₺</title><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${Math.max(rr,10)}" fill="transparent"/><circle cx="${X(p.x)}" cy="${Y(p.v)}" r="${rr}" fill="var(--bar)" fill-opacity=".75" stroke="var(--surface)" stroke-width="2"/></g>`; }).join("");
   const ay = Y(avg);
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Şarj başına birim fiyat">${g}
     <line x1="${Lm}" x2="${W-R}" y1="${ay}" y2="${ay}" stroke="var(--warn)" stroke-dasharray="4 4" stroke-width="1.5"/>${dots}
@@ -453,7 +452,6 @@ function openForm(r){
   editingId = r ? r.id : null; delArmed = false;
   $("form").hidden = false;
   $("f-date").value = r ? r.date : new Date().toISOString().slice(0,10);
-  $("f-time").value = r ? (r.time || "") : "";
   $("f-start").value = r && has(r.start) ? r.start : "";
   $("f-end").value = r && has(r.end) ? r.end : "";
   $("f-odo").value = r && has(r.odo) ? r.odo : "";
@@ -499,7 +497,7 @@ $("form").addEventListener("submit", async e => {
   e.preventDefault(); if (busy) return;
   const opt = v => { const n = parseNum(v); return isFinite(n) ? n : null; };
   const d = {
-    date: $("f-date").value, time: $("f-time").value || "",
+    date: $("f-date").value,
     start: opt($("f-start").value), end: opt($("f-end").value),
     odo: opt($("f-odo").value), kwh: parseNum($("f-kwh").value), tl: parseNum($("f-tl").value),
     note: $("f-note").value.trim()
